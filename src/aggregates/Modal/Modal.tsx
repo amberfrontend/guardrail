@@ -1,58 +1,56 @@
-import { ReactNode, useId, useRef, useEffect } from 'react';
+import { ReactNode, useState, useId, useRef } from 'react';
+import { createPortal } from 'react-dom';
+
 import Button from '../../elements/Button/Button';
+import Dialog from './components/Dialog';
 
 interface ModalProps {
   children: ReactNode;
-  id?: string;
   title: string;
-  onClose(): void;
+  triggerButtonText: string;
 }
 
 export default function Modal(props: ModalProps) {
-  const { children, id, title, onClose } = props;
+  const [isOpen, setIsOpen] = useState(false);
 
-  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const triggerButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const uniqueId = useId();
 
-  useEffect(() => {
-    if (closeButtonRef && closeButtonRef.current)
-      closeButtonRef.current.focus();
-  }, []);
+  const handleModalClose = () => {
+    setIsOpen(false);
+
+    if (triggerButtonRef && triggerButtonRef.current) {
+      triggerButtonRef.current.focus();
+    }
+  };
+
+  const { children, title, triggerButtonText } = props;
 
   return (
-    <div
-      id={id || `modal-wrapper-${uniqueId}`}
-      className="z-50"
-      aria-labelledby={`modal-title-${uniqueId}`}
-      aria-modal="true"
-      role="dialog"
-    >
-      <div className="flex justify-between">
-        <h1 id={`modal-title-${uniqueId}`}>{title}</h1>
-        <Button
-          ariaLabel="Close"
-          ariaDescribedby={`modal-title-${uniqueId}`}
-          icon="close"
-          ref={closeButtonRef}
-          type="icon-only"
-          onClick={onClose}
-          onKeyUp={onClose}
-          onTouchEnd={onClose}
-        />
-      </div>
-      {children}
-      <div className="flex justify-end">
-        <Button
-          ariaDescribedby={`modal-title-${uniqueId}`}
-          type="text"
-          onClick={onClose}
-          onKeyUp={onClose}
-          onTouchEnd={onClose}
-        >
-          Cancel
-        </Button>
-      </div>
-    </div>
+    <>
+      <Button
+        ariaControls={`modal-${uniqueId}`}
+        ariaExpanded={isOpen}
+        ref={triggerButtonRef}
+        type="modal-trigger"
+        onClick={() => setIsOpen(true)}
+        onKeyUp={() => setIsOpen(true)}
+        onTouchEnd={() => setIsOpen(true)}
+      >
+        {triggerButtonText}
+      </Button>
+      {isOpen &&
+        createPortal(
+          <Dialog
+            id={`modal-wrapper-${uniqueId}`}
+            title={title}
+            onClose={handleModalClose}
+          >
+            {children}
+          </Dialog>,
+          document.body,
+        )}
+    </>
   );
 }

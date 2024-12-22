@@ -25,7 +25,6 @@ export const OverlayTrigger: Story = {
     ariaControls: 'string',
     ariaExpanded: false,
     children: 'Stuff',
-    moveFocus: false,
   },
   name: 'Overlay trigger',
 };
