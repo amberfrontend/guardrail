@@ -58,7 +58,7 @@ export default function Toggle({
             role="switch"
             onClick={handleToggle}
             onKeyDown={handleKeyDown}
-            onTouchStart={handleToggle}
+            onTouchEnd={handleToggle}
           >
             <div className="flex items-center justify-center bg-white rounded-full w-5 h-5">
               {isChecked ? <FaCheck /> : <FaXmark />}
