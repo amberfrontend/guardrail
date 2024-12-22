@@ -4,7 +4,6 @@ import {
   MouseEvent,
   KeyboardEvent,
   TouchEvent,
-  useEffect,
 } from 'react';
 import {
   FaAngleDown,
@@ -67,7 +66,6 @@ type TypeProps =
       ariaExpanded: boolean;
       ariaLabel?: string;
       children: ReactNode;
-      moveFocus: boolean;
       type: 'modal-trigger';
     }
   | {
@@ -89,12 +87,6 @@ type ButtonProps = TypeProps & SharedProps;
 export default function Button(props: ButtonProps) {
   const { ariaDescribedby, disabled, type, ref, onClick, onKeyUp, onTouchEnd } =
     props;
-
-  useEffect(() => {
-    if (type === 'modal-trigger' && props.moveFocus && ref && ref.current) {
-      ref.current.focus();
-    }
-  }, [props, ref, type]);
 
   const handleOnClick = (event: MouseEvent) => {
     if (disabled) {
