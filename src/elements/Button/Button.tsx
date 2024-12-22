@@ -1,4 +1,11 @@
-import { ReactNode, MouseEvent, KeyboardEvent, TouchEvent } from 'react';
+import {
+  ReactNode,
+  RefObject,
+  MouseEvent,
+  KeyboardEvent,
+  TouchEvent,
+  useEffect,
+} from 'react';
 import {
   FaAngleDown,
   FaAngleLeft,
@@ -23,8 +30,6 @@ import {
 } from 'react-icons/fa6';
 
 import { buttonClasses } from '../sharedClasses';
-
-type ButtonStyle = 'primary' | 'secondary' | 'utility';
 
 type IconButtonIcon =
   | 'arrowDown'
@@ -62,54 +67,65 @@ type TypeProps =
       ariaExpanded: boolean;
       ariaLabel?: string;
       children: ReactNode;
-      type: 'overlay-trigger';
+      moveFocus: boolean;
+      type: 'modal-trigger';
+    }
+  | {
+      children: string;
+      type: 'text';
     };
 
 type SharedProps = {
+  ariaDescribedby?: string;
   disabled?: boolean;
-  style?: ButtonStyle;
+  ref?: RefObject<HTMLButtonElement | null>;
   onClick(): void;
-  onKeyDown(): void;
-  onTouchStart(): void;
+  onKeyUp(): void;
+  onTouchEnd(): void;
 };
 
 type ButtonProps = TypeProps & SharedProps;
 
 export default function Button(props: ButtonProps) {
-  const {
-    disabled,
-    type,
-    style = 'primary',
-    onClick,
-    onKeyDown,
-    onTouchStart,
-  } = props;
+  const { ariaDescribedby, disabled, type, ref, onClick, onKeyUp, onTouchEnd } =
+    props;
+
+  useEffect(() => {
+    if (type === 'modal-trigger' && props.moveFocus && ref && ref.current) {
+      ref.current.focus();
+    }
+  }, [props, ref, type]);
 
   const handleOnClick = (event: MouseEvent) => {
     if (disabled) {
-      event.preventDefault();
       event.stopPropagation();
+      event.preventDefault();
       return;
     }
+
     onClick();
   };
 
   const handleOnKeyDown = (event: KeyboardEvent) => {
     if (disabled) {
-      event.preventDefault();
       event.stopPropagation();
+      event.preventDefault();
       return;
     }
-    onKeyDown();
+
+    if (event.code === 'Enter' || event.code === 'Space') {
+      onKeyUp();
+    }
   };
 
-  const handleTouchStart = (event: TouchEvent) => {
+  const handleTouchEnd = (event: TouchEvent) => {
     if (disabled) {
-      event.preventDefault();
       event.stopPropagation();
+      event.preventDefault();
       return;
     }
-    onTouchStart();
+
+    onTouchEnd();
   };
 
   let inner;
@@ -150,20 +166,25 @@ export default function Button(props: ButtonProps) {
     };
 
     inner = <IconComponent size={iconSizes[size]} />;
-  } else if (type === 'overlay-trigger') {
+  } else if (type === 'modal-trigger') {
     const { ariaControls, ariaExpanded, children } = props;
     typeProps = { ariaControls, ariaExpanded, children };
 
+    inner = children;
+  } else if (type === 'text') {
+    const { children } = props;
     inner = children;
   }
 
   return (
     <button
+      aria-describedby={ariaDescribedby || undefined}
       aria-disabled={disabled || undefined}
-      className={`${buttonClasses['button']} ${buttonClasses[style]}`}
+      className={`${buttonClasses['button']}`}
+      ref={ref}
       onClick={handleOnClick}
-      onKeyDown={handleOnKeyDown}
-      onTouchStart={handleTouchStart}
+      onKeyUp={handleOnKeyDown}
+      onTouchEnd={handleTouchEnd}
       {...typeProps}
     >
       {inner}

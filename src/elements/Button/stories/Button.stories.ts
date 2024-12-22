@@ -13,7 +13,7 @@ const meta = {
   argTypes: {
     type: { control: 'select' },
   },
-  args: { onClick: fn(), onKeyDown: fn(), onTouchStart: fn() },
+  args: { onClick: fn(), onKeyUp: fn(), onTouchEnd: fn() },
 } satisfies Meta<typeof Button>;
 
 export default meta;
@@ -21,10 +21,11 @@ type Story = StoryObj<typeof meta>;
 
 export const OverlayTrigger: Story = {
   args: {
-    type: 'overlay-trigger',
+    type: 'modal-trigger',
     ariaControls: 'string',
     ariaExpanded: false,
     children: 'Stuff',
+    moveFocus: false,
   },
   name: 'Overlay trigger',
 };

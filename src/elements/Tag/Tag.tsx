@@ -17,8 +17,8 @@ export default function Tag({ children, onRemove }: TagProps) {
           icon="close"
           type="icon-only"
           onClick={onRemove}
-          onKeyDown={onRemove}
-          onTouchStart={onRemove}
+          onKeyUp={onRemove}
+          onTouchEnd={onRemove}
         />
       )}
     </div>
